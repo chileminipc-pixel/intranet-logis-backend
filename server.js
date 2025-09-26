@@ -14,15 +14,13 @@ const app = express();
 // 🛡️ CORS: Configuración para desarrollo y producción
 const corsOptions = {
   origin: function (origin, callback) {
-    // Lista de dominios permitidos
     const allowedOrigins = [
-      'http://localhost:5173', // Desarrollo
-      'http://localhost:3000', // Desarrollo alternativo
-      'https://intranet-logis-front-hgieqvi8a-mini-pc-chiles-projects.vercel.app', // Tu frontend en producción - ACTUALIZA ESTO
-      'https://intranet-logis-front.vercel.app/', // Tu frontend en producción - ACTUALIZA ESTO
+      'http://localhost:5173',
+      'http://localhost:3000', 
+      'https://intranet-logis-front-hgieqvi8a-mini-pc-chiles-projects.vercel.app',
+      'https://intranet-logis-front.vercel.app' // ⚠️ Quita la barra final
     ];
     
-    // Permitir requests sin origin (como Postman o mobile apps)
     if (!origin) return callback(null, true);
     
     if (allowedOrigins.indexOf(origin) !== -1) {
@@ -31,7 +29,9 @@ const corsOptions = {
       callback(new Error('No permitido por CORS'));
     }
   },
-  credentials: true
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // ✅ Agregar esto
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'] // ✅ También esto
 };
 
 app.use(cors(corsOptions));
@@ -82,7 +82,7 @@ app.use((err, req, res, next) => {
       error: 'Origen no permitido',
       allowedOrigins: [
         'http://localhost:5173',
-        'https://tu-frontend.vercel.app',
+        'intranet-logis-front.vercel.app',
         ''
       ]
     });
@@ -125,5 +125,5 @@ app.listen(PORT, HOST, () => {
   console.log(`✅ Health check: http://${HOST}:${PORT}/health`);
   console.log(`🛡️ CORS permitido para:`);
   console.log('   - http://localhost:5173');
-  console.log('   - https://tu-frontend.vercel.app');
+  console.log('   - intranet-logis-front.vercel.app');
 });
