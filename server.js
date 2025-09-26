@@ -31,9 +31,6 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' })); // Límite para subida de archivos
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ Servir archivos estáticos desde /public
-app.use(express.static('public'));
-
 // ✅ Ruta de salud para Railway
 app.get('/health', (req, res) => {
   res.status(200).json({ 
@@ -77,7 +74,8 @@ app.use((err, req, res, next) => {
       error: 'Origen no permitido',
       allowedOrigins: [
         'http://localhost:5173',
-        'https://tu-frontend.vercel.app'
+        'https://tu-frontend.vercel.app',
+        ''
       ]
     });
   }
@@ -87,6 +85,9 @@ app.use((err, req, res, next) => {
     message: process.env.NODE_ENV === 'production' ? 'Algo salió mal' : err.message
   });
 });
+
+// ✅ Servir archivos estáticos desde /public
+app.use(express.static('public'));
 
 // ✅ Ruta 404 para endpoints no encontrados
 // ✅ Ruta 404 para endpoints no encontrados - CORREGIDO
