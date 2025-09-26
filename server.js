@@ -49,7 +49,7 @@ app.get('/', (req, res) => {
     message: '¡Bienvenido a la API de Logis!',
     version: '1.0.0',
     environment: process.env.NODE_ENV || 'development',
-    docs: '/api-docs' // Si tienes documentación
+    // docs: '/api-docs' // Si tienes documentación
   });
 });
 
@@ -89,7 +89,8 @@ app.use((err, req, res, next) => {
 });
 
 // ✅ Ruta 404 para endpoints no encontrados
-app.use('*', (req, res) => {
+// ✅ Ruta 404 para endpoints no encontrados - CORREGIDO
+app.use((req, res) => {
   res.status(404).json({ 
     error: 'Endpoint no encontrado',
     path: req.originalUrl,
