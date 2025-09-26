@@ -18,7 +18,8 @@ const corsOptions = {
     const allowedOrigins = [
       'http://localhost:5173', // Desarrollo
       'http://localhost:3000', // Desarrollo alternativo
-      'Value: https://intranet-logis-front-hgieqvi8a-mini-pc-chiles-projects.vercel.app' // Tu frontend en producción - ACTUALIZA ESTO
+      'https://intranet-logis-front-hgieqvi8a-mini-pc-chiles-projects.vercel.app', // Tu frontend en producción - ACTUALIZA ESTO
+      'https://intranet-logis-front.vercel.app/', // Tu frontend en producción - ACTUALIZA ESTO
     ];
     
     // Permitir requests sin origin (como Postman o mobile apps)
