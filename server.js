@@ -5,35 +5,35 @@ const cors = require('cors');
 const app = express();
 
 // 🛡️ CORS: TEMPORAL - Permitir todos los orígenes para testing
-app.use(cors({
-  origin: true,  // ✅ Permitir TODOS los orígenes
-  credentials: true
-}));
-
-
-// // 🛡️ CORS: Configuración para desarrollo y producción
-// const corsOptions = {
-//   origin: function (origin, callback) {
-//     // Lista de dominios permitidos
-//     const allowedOrigins = [
-//       'http://localhost:5173', // Desarrollo
-//       'http://localhost:3000', // Desarrollo alternativo
-//       'https://tu-frontend.vercel.app' // Tu frontend en producción - ACTUALIZA ESTO
-//     ];
-    
-//     // Permitir requests sin origin (como Postman o mobile apps)
-//     if (!origin) return callback(null, true);
-    
-//     if (allowedOrigins.indexOf(origin) !== -1) {
-//       callback(null, true);
-//     } else {
-//       callback(new Error('No permitido por CORS'));
-//     }
-//   },
+// app.use(cors({
+//   origin: true,  // ✅ Permitir TODOS los orígenes
 //   credentials: true
-// };
+// }));
 
-//app.use(cors(corsOptions));
+
+// 🛡️ CORS: Configuración para desarrollo y producción
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Lista de dominios permitidos
+    const allowedOrigins = [
+      'http://localhost:5173', // Desarrollo
+      'http://localhost:3000', // Desarrollo alternativo
+      'https://tu-frontend.vercel.app' // Tu frontend en producción - ACTUALIZA ESTO
+    ];
+    
+    // Permitir requests sin origin (como Postman o mobile apps)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('No permitido por CORS'));
+    }
+  },
+  credentials: true
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json({ limit: '10mb' })); // Límite para subida de archivos
 app.use(express.urlencoded({ extended: true }));
