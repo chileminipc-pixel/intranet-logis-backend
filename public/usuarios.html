@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Mantenedor de Usuarios</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; background: #f9f9f9; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
+    input, select, button { margin: 0.5rem; padding: 0.5rem; }
+    #formUsuario { margin-top: 2rem; background: #fff; padding: 1rem; border-radius: 8px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body>
+  <h1>🛠️ Mantenedor de Usuarios</h1>
+
+  <h2>🔍 Filtrar Usuarios</h2>
+  <input type="text" id="filtroEmail" placeholder="Buscar por email">
+  <select id="filtroCliente">
+    <option value="">Todas las empresas</option>
+    <!-- Se llenará dinámicamente con cargarClientes() -->
+  </select>
+  <button onclick="filtrarUsuarios()">Buscar</button>
+  <button onclick="cargarUsuarios()">Limpiar</button>
+
+<div class="export-buttons">
+  <button onclick="exportarUsuarios('csv')">📥 CSV</button>
+  <button onclick="exportarPDFConTabla()">📄 PDF (tabla)</button>
+</div>
+
+  <table id="tablaUsuarios">
+    <thead>
+      <tr>
+        <th>Email</th>
+        <th>Rol</th>
+        <th>Cliente</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div id="formUsuario">
+    <h2>➕ Crear / Editar Usuario</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Contraseña">
+    <select id="rol">
+      <option value="admin">admin</option>
+      <option value="cliente">cliente</option>
+    </select>
+    <select id="cliente_id"></select>
+    <button onclick="guardarUsuario()">Guardar</button>
+  </div>
+
+  <!-- script -->
+  <script>
+    const token = localStorage.getItem('token');
+    const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
+
+    function exportarUsuarios(formato) {
+      const email = document.getElementById('filtroEmail').value;
+      const cliente_id = document.getElementById('filtroCliente').value;
+      const token = localStorage.getItem('token');
+
+      const params = new URLSearchParams();
+      if (email.trim() !== '') params.append('email', email);
+      if (cliente_id !== '') params.append('cliente_id', cliente_id);
+      params.append('token', token); // ✅ incluir token
+
+      window.open(`/usuarios/exportar/${formato}?${params.toString()}`, '_blank');
+    }
+
+    
+    function exportarPDFConTabla() {
+      const email = document.getElementById('filtroEmail').value;
+      const cliente_id = document.getElementById('filtroCliente').value;
+      const token = localStorage.getItem('token');
+
+      const params = new URLSearchParams();
+      if (email.trim() !== '') params.append('email', email);
+      if (cliente_id !== '') params.append('cliente_id', cliente_id);
+      params.append('token', token); // ✅ incluir token en la URL
+
+      window.open(`/usuarios/exportar/pdf?${params.toString()}`, '_blank');
+    }
+
+    function cargarUsuarios() {
+      fetch('/usuarios', { headers })
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.querySelector('#tablaUsuarios tbody');
+          tbody.innerHTML = '';
+          data.forEach(u => {
+            const fila = `
+              <tr>
+                <td>${u.email}</td>
+                <td>${u.rol}</td>
+                <td>${u.empresa}</td>
+                <td>
+                  <button onclick="editarUsuario(${u.id})">✏️</button>
+                  <button onclick="eliminarUsuario(${u.id})">🗑️</button>
+                </td>
+              </tr>
+            `;
+            tbody.innerHTML += fila;
+          });
+        });
+    }
+
+  function cargarClientes() {
+    fetch('/clientes', { headers })
+      .then(res => res.json())
+      .then(clientes => {
+        const select = document.getElementById('cliente_id');
+        const filtro = document.getElementById('filtroCliente');
+
+        clientes.forEach(c => {
+          const option = document.createElement('option');
+          option.value = c.id;
+          option.textContent = c.nombre;
+          select.appendChild(option);
+
+          const filtroOption = option.cloneNode(true);
+          filtro.appendChild(filtroOption);
+        });
+      });
+  }
+
+  function guardarUsuario() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const rol = document.getElementById('rol').value;
+    const cliente_id = document.getElementById('cliente_id').value;
+
+    const body = {
+      email,
+      rol,
+      cliente_id,
+      password
+    };
+
+      if (usuarioEditando) {
+        fetch(`/usuarios/${usuarioEditando}`, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify(body)
+        })
+        .then(res => res.json())
+        .then(() => {
+          alert('✏️ Usuario actualizado');
+          usuarioEditando = null;
+          limpiarFormulario();
+          cargarUsuarios();
+        });
+      } else {
+        if (!email || !password || password.length < 6 || !rol || !cliente_id) {
+          alert('⚠️ Todos los campos son obligatorios y la contraseña debe tener al menos 6 caracteres');
+          return;
+        }
+        fetch('/usuarios', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ ...body, password }) // aquí sí es obligatorio
+        })
+        .then(res => res.json())
+        .then(() => {
+          alert('✅ Usuario creado');
+          limpiarFormulario();
+          cargarUsuarios();
+        });
+      }
+    // Solo incluir password si el campo no está vacío
+    if (password.trim() !== '') {
+      body.password = password;
+       alert('🔐 Se actualizará la contraseña');
+        } else if (usuarioEditando) {
+          alert('✏️ Se actualizarán los datos, sin cambiar la contraseña');
+        }
+
+    }
+
+    
+  
+
+function limpiarFormulario() {
+  document.getElementById('email').value = '';
+  document.getElementById('password').value = '';
+  document.getElementById('rol').value = 'Usuario';
+  document.getElementById('cliente_id').selectedIndex = 0;
+}
+
+ let usuarioEditando = null; // variable global para saber si estamos editando
+function editarUsuario(id) {
+  fetch(`/usuarios/${id}`, { headers })
+    .then(res => res.json())
+    .then(usuario => {
+      document.getElementById('email').value = usuario.email;
+      document.getElementById('password').value = ''; // no se muestra el hash
+      document.getElementById('rol').value = usuario.rol;
+      document.getElementById('cliente_id').value = usuario.cliente_id;
+      usuarioEditando = id; // guardamos el ID para saber que estamos editando
+    });
+}
+
+    function eliminarUsuario(id) {
+      fetch(`/usuarios/${id}`, {
+        method: 'DELETE',
+        headers
+      })
+      .then(() => {
+        cargarUsuarios();
+        alert('🗑️ Usuario eliminado');
+      });
+    }
+
+      // ✅ Aquí agregas la función de filtrado
+  function filtrarUsuarios() {
+    const email = document.getElementById('filtroEmail').value;
+    const cliente_id = document.getElementById('filtroCliente').value;
+
+    const params = new URLSearchParams();
+    if (email.trim() !== '') params.append('email', email);
+    if (cliente_id !== '') params.append('cliente_id', cliente_id);
+
+    fetch(`/usuarios/buscar?${params.toString()}`, { headers })
+      .then(res => res.json())
+      .then(data => {
+        const tbody = document.querySelector('#tablaUsuarios tbody');
+        tbody.innerHTML = '';
+        data.forEach(u => {
+          const fila = `
+            <tr>
+              <td>${u.email}</td>
+              <td>${u.rol}</td>
+              <td>${u.empresa}</td>
+              <td>
+                <button onclick="editarUsuario(${u.id})">✏️</button>
+                <button onclick="eliminarUsuario(${u.id})">🗑️</button>
+              </td>
+            </tr>
+          `;
+          tbody.innerHTML += fila;
+        });
+      });
+  }
+
+    cargarUsuarios();
+    cargarClientes();
+  </script>
+</body>
+</html>

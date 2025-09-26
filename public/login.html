@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <style>
+    body { font-family: sans-serif; background: #f4f4f4; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 300px; }
+    input, button { width: 100%; margin-top: 1rem; padding: 0.5rem; }
+    #mensajeError { color: red; margin-top: 1rem; display: none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Iniciar sesión</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Contraseña">
+    <button onclick="iniciarSesion()">Entrar</button>
+    <div id="mensajeError"></div>
+  </div>
+
+  <script>
+    function iniciarSesion() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Credenciales inválidas');
+        return res.json();
+      })
+      .then(data => {
+        localStorage.setItem('token', data.token);
+        window.location.href = '/dashboard.html'; // ajusta según tu ruta
+      })
+      .catch(err => {
+        document.getElementById('mensajeError').textContent = '⚠️ Email o contraseña incorrectos';
+        document.getElementById('mensajeError').style.display = 'block';
+      });
+    }
+  </script>
+</body>
+</html>

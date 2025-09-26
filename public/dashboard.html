@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard Logis</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .card { border: 1px solid #ccc; padding: 16px; margin-bottom: 12px; border-radius: 8px; }
+    .card h2 { margin: 0 0 8px; }
+    .sucursal { margin-left: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    #paginacion button { margin: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Dashboard Logis</h1>
+
+  <div id="infoUsuario" class="card">
+        <button id="btnUsuarios" style="display: none;">🛠️ Mantenedor de Usuarios</button>
+        <h2>Datos del Usuario</h2>
+        <p><strong>Email:</strong> <span id="emailUsuario"></span></p>
+        <p><strong>Rol:</strong> <span id="rolUsuario"></span></p>
+        <p><strong>Empresa:</strong> <span id="empresaUsuario"></span></p>
+        <button onclick="cerrarSesion()">Cerrar sesión</button>
+  </div>
+  <div id="resumen"></div>
+  <div id="sucursales"></div>
+
+  <h2>Guías</h2>
+  <div>
+    <label>Sucursal:</label>
+    <select id="filtroSucursal">
+      <option value="">Todas</option>
+    </select>
+    <select id="filtroServicio"></select>
+    <select id="filtroFrecuencia"></select>
+     <label>Guia:</label><input type="text" id="filtroGuia" placeholder="Buscar N° Guía">
+     <label>Patente:</label><input type="text" id="filtroPatente" placeholder="Buscar Patente">
+    <label>Desde:</label>
+    <input type="date" id="filtroDesde">
+    <label>Hasta:</label>
+    <input type="date" id="filtroHasta">
+    <button onclick="cargarGuias()">Filtrar</button>
+    <button onclick="exportarGuias('csv')">📥 Exportar Guías CSV</button>
+    <button onclick="exportarGuias('pdf')">📄 Exportar Guías PDF</button>
+  </div>
+  
+<table id="tablaGuias">
+  <thead>
+    <tr>
+      <th>Fecha</th>
+      <th>Guía</th>
+      <th>Sucursal</th>
+      <th>Servicio</th>
+      <th>Frecuencia</th>
+      <th>Lts límite</th>
+      <th>Lts retirados</th>
+      <th>Valor servicio</th>
+      <th>Valor lt adicional</th>
+      <th>Patente</th>
+      <th>Total</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+
+  <div id="paginacion"></div>
+
+<h2>Facturas Impagas</h2>
+<div>
+  <label>Sucursal Facturas:</label>
+  <select id="filtroSucursalFacturas" onchange="cargarFacturas()">
+    <option value="">Todas</option>
+  </select>
+  <label>Desde:</label>
+  <input type="date" id="filtroDesdeFacturas">
+  <label>Hasta:</label>
+  <input type="date" id="filtroHastaFacturas">
+  <button onclick="cargarFacturas()">Filtrar Facturas</button>
+ <button onclick="exportarFacturasImpagasCSV()">📥 Exportar Facturas CSV</button>
+  <button onclick="exportarFacturasImpagasPDF()">📄 Exportar Facturas PDF</button>
+
+</div>
+
+<table id="tablaFacturas">
+  <thead>
+    <tr>
+      <th>Fecha</th>
+      <th>N° Factura</th>
+      <th>Sucursal</th>
+      <th>Días de mora</th>
+      <th>Monto</th>
+      <th>Estado</th>
+      <th>Observaciones</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+<div id="paginacionFacturas"></div>
+
+
+<div id="paginacionFacturas"></div>
+
+<script src="/js/dashboard.js"></script>
+</body>
+</html>
