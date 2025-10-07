@@ -30,7 +30,7 @@ router.get('/exportar/:formato', verificarToken, async (req, res) => {
   }
 
   if (fecha_inicio && fecha_fin) {
-    sql += ' AND g.fecha_emision BETWEEN ? AND ?';
+    sql += ' AND g.fecha BETWEEN ? AND ?';
     params.push(fecha_inicio, fecha_fin);
   }
 
